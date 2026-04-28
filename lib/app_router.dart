@@ -1,10 +1,10 @@
 import 'package:go_router/go_router.dart';
 
-import 'screens/login_screen.dart';
-import 'screens/home_screen.dart';
-import 'screens/students_screen.dart';
-import 'screens/search_screen.dart';
-import 'screens/charts_screen.dart';
+import 'presentation/screens/login_screen.dart';
+import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/students_screen.dart';
+import 'presentation/screens/search_screen.dart';
+import 'presentation/screens/charts_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/login',
