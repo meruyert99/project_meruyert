@@ -1,51 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/student_cubit.dart';
 
-class StudentsScreen extends StatefulWidget {
+class StudentsScreen extends StatelessWidget {
   const StudentsScreen({super.key});
 
   @override
-  State<StudentsScreen> createState() => _StudentsScreenState();
-}
-
-class _StudentsScreenState extends State<StudentsScreen> {
-  final box = Hive.box('studentsBox');
-
-  List get students => box.values.toList();
-
-  void addActivity(int index) {
-    var student = students[index];
-    student['activity'] += 1;
-
-    box.putAt(index, student);
-    setState(() {});
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text("Students")),
-      body: ListView.builder(
-        itemCount: students.length,
-        itemBuilder: (context, index) {
-          final s = students[index];
+    final cubit = context.read<StudentCubit>();
 
-          return ListTile(
-            title: Text(s['name']),
-            subtitle: Text("Activity: ${s['activity']}"),
-            trailing: IconButton(
-              icon: Icon(Icons.add),
-              onPressed: () => addActivity(index),
-            ),
+    return Scaffold(
+      appBar: AppBar(title: const Text("Students")),
+
+      body: BlocBuilder<StudentCubit, List>(
+        builder: (context, students) {
+          return ListView.builder(
+            itemCount: students.length,
+            itemBuilder: (_, i) {
+              final s = students[i];
+              return ListTile(
+                title: Text(s['name']),
+                trailing: IconButton(
+                  icon: const Icon(Icons.delete),
+                  onPressed: () => cubit.delete(i),
+                ),
+              );
+            },
           );
         },
       ),
+
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          box.add({'name': 'Student ${students.length + 1}', 'activity': 0});
-          setState(() {});
-        },
-        child: Icon(Icons.add),
+        onPressed: () => cubit.add("Student ${DateTime.now().second}"),
+        child: const Icon(Icons.add),
       ),
     );
   }
