@@ -1,17 +1,15 @@
+import 'session_model.dart';
+
 class Student {
-  String name;
-  int activity;
+  final String name;
+  final List<Session> sessions;
 
-  Student({required this.name, this.activity = 0});
+  Student({required this.name, required this.sessions});
 
-  Map<String, dynamic> toMap() {
-    return {'name': name, 'activity': activity};
-  }
-
-  static Student fromMap(Map data) {
-    return Student(
-      name: data['name'],
-      activity: data['activity'],
-    );
-  }
+  factory Student.fromMap(Map map) => Student(
+        name: map['name'],
+        sessions: (map['sessions'] as List? ?? [])
+            .map((e) => Session.fromMap(e))
+            .toList(),
+      );
 }
