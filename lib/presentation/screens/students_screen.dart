@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/student_cubit.dart';
+import '../bloc/students_cubit.dart';
 
 class StudentsScreen extends StatelessWidget {
   const StudentsScreen({super.key});
