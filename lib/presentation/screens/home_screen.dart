@@ -7,19 +7,15 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Home")),
+      appBar: AppBar(title: const Text('Dashboard')),
       body: Column(
         children: [
           ListTile(
-            title: Text("Students"),
+            title: const Text("Students"),
             onTap: () => context.push('/students'),
           ),
           ListTile(
-            title: Text("Search"),
-            onTap: () => context.push('/search'),
-          ),
-          ListTile(
-            title: Text("Charts"),
+            title: const Text("Charts"),
             onTap: () => context.push('/charts'),
           ),
         ],
