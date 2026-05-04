@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../../services/chart_service.dart';
+import '../../core/chart_service.dart';
 import '../bloc/student_cubit.dart';
 import '../bloc/tracking_cubit.dart';
 
