@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../data/repositories/student_repository.dart';
+import '../../domain/repositories/student_repository.dart';
 
 class StudentCubit extends Cubit<List> {
   final repo;
