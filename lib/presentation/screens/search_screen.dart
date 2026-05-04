@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
+import 'package:flutter_bloc/flutter_bloc.dart';
+import '../bloc/student_cubit.dart';
+
+
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
 
