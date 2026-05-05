@@ -29,6 +29,15 @@ class _StudentsScreenState extends State<StudentsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Students (class ${widget.classIndex})'),
+
+        // 🔄 RESET ALL BUTTON
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: "Reset all activities",
+            onPressed: () => _confirmResetAll(context),
+          ),
+        ],
       ),
 
       body: Column(
@@ -67,16 +76,16 @@ class _StudentsScreenState extends State<StudentsScreen> {
                 return ListView.builder(
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
-                    final s = filtered[index];
-                    final originalIndex = students.indexOf(s);
+                    final student = filtered[index];
+                    final originalIndex = students.indexOf(student);
+
+                    final activityCount =
+                        (student['activities'] as List?)?.length ?? 0;
 
                     return ListTile(
-                      title: Text(s['name']),
+                      title: Text(student['name']),
 
-                      // 🔥 FIXED ACTIVITY
-                      subtitle: Text(
-                        'Activity: ${(s['activities'] as List?)?.length ?? 0}',
-                      ),
+                      subtitle: Text('Activity: $activityCount'),
 
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -106,6 +115,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
         ],
       ),
 
+      // ➕ ADD STUDENT
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context),
         child: const Icon(Icons.add),
@@ -113,7 +123,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // ➕ ADD
+  // ➕ ADD STUDENT DIALOG
   void _showAddDialog(BuildContext context) {
     final controller = TextEditingController();
 
@@ -133,12 +143,10 @@ class _StudentsScreenState extends State<StudentsScreen> {
           ElevatedButton(
             onPressed: () {
               final text = controller.text.trim();
-
               if (text.isEmpty) return;
 
               context.read<StudentsCubit>().addStudent(text);
 
-              // 🔥 очищаем поиск чтобы сразу увидеть
               searchController.clear();
               setState(() => query = '');
 
@@ -151,7 +159,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // 🗑 DELETE
+  // 🗑 DELETE STUDENT
   void _confirmDelete(BuildContext context, int index) {
     showDialog(
       context: context,
@@ -172,6 +180,35 @@ class _StudentsScreenState extends State<StudentsScreen> {
               Navigator.pop(context);
             },
             child: const Text("Delete"),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 🔄 RESET ALL CONFIRMATION
+  void _confirmResetAll(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Reset all activities"),
+        content: const Text(
+          "This will clear ALL students activities. Continue?",
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            onPressed: () {
+              context.read<StudentsCubit>().resetAllActivities();
+              Navigator.pop(context);
+            },
+            child: const Text("Reset"),
           ),
         ],
       ),
