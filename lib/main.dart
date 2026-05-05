@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'app_router.dart';
-import 'domain/repositories/student_repository.dart';
+import 'data/repositories/student_repository.dart';
 import 'presentation/bloc/students_cubit.dart';
 import 'presentation/bloc/tracking_cubit.dart';
 
