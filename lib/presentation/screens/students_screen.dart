@@ -33,7 +33,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
       body: Column(
         children: [
-          // 🔍 SEARCH FIELD
+          // 🔍 SEARCH
           Padding(
             padding: const EdgeInsets.all(12),
             child: TextField(
@@ -55,26 +55,28 @@ class _StudentsScreenState extends State<StudentsScreen> {
           Expanded(
             child: BlocBuilder<StudentsCubit, List<Map>>(
               builder: (context, students) {
-                // 🔍 FILTER
                 final filtered = students.where((s) {
                   final name = (s['name'] ?? '').toLowerCase();
                   return name.contains(query);
                 }).toList();
 
                 if (filtered.isEmpty) {
-                  return const Center(
-                    child: Text("No students"),
-                  );
+                  return const Center(child: Text("No students"));
                 }
 
                 return ListView.builder(
                   itemCount: filtered.length,
                   itemBuilder: (context, index) {
                     final s = filtered[index];
+                    final originalIndex = students.indexOf(s);
 
                     return ListTile(
                       title: Text(s['name']),
-                      subtitle: Text('Activity: ${s['activity']}'),
+
+                      // 🔥 FIXED ACTIVITY
+                      subtitle: Text(
+                        'Activity: ${(s['activities'] as List?)?.length ?? 0}',
+                      ),
 
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -82,19 +84,14 @@ class _StudentsScreenState extends State<StudentsScreen> {
                           IconButton(
                             icon: const Icon(Icons.add),
                             onPressed: () {
-                              final originalIndex =
-                                  students.indexOf(s); // 👈 важно!
                               context
                                   .read<StudentsCubit>()
                                   .addActivity(originalIndex);
                             },
                           ),
-
                           IconButton(
                             icon: const Icon(Icons.delete),
                             onPressed: () {
-                              final originalIndex =
-                                  students.indexOf(s);
                               _confirmDelete(context, originalIndex);
                             },
                           ),
@@ -116,7 +113,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // ADD
+  // ➕ ADD
   void _showAddDialog(BuildContext context) {
     final controller = TextEditingController();
 
@@ -126,9 +123,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
         title: const Text("Add Student"),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: "Enter name",
-          ),
+          decoration: const InputDecoration(hintText: "Enter name"),
         ),
         actions: [
           TextButton(
@@ -137,9 +132,16 @@ class _StudentsScreenState extends State<StudentsScreen> {
           ),
           ElevatedButton(
             onPressed: () {
-              if (controller.text.isNotEmpty) {
-                context.read<StudentsCubit>().addStudent(controller.text);
-              }
+              final text = controller.text.trim();
+
+              if (text.isEmpty) return;
+
+              context.read<StudentsCubit>().addStudent(text);
+
+              // 🔥 очищаем поиск чтобы сразу увидеть
+              searchController.clear();
+              setState(() => query = '');
+
               Navigator.pop(context);
             },
             child: const Text("Add"),
@@ -149,7 +151,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // DELETE
+  // 🗑 DELETE
   void _confirmDelete(BuildContext context, int index) {
     showDialog(
       context: context,

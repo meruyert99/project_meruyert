@@ -4,13 +4,14 @@ class StudentRepository {
   Box get box => Hive.box('studentsBox');
 
   List<Map> getStudents() {
-    return box.values.map((e) => Map<String, dynamic>.from(e)).toList();
+    if (box.isEmpty) return [];
+
+    final classItem = Map<String, dynamic>.from(box.getAt(0));
+    return List<Map>.from(classItem['students'] ?? []);
   }
 
   void addStudent(String name) {
-    final students = box.values.toList();
-
-    if (students.isEmpty) {
+    if (box.isEmpty) {
       box.add({
         "name": "Class 1",
         "students": []
@@ -18,16 +19,14 @@ class StudentRepository {
     }
 
     final classItem = Map<String, dynamic>.from(box.getAt(0));
+    final students = List<Map>.from(classItem['students'] ?? []);
 
-    final list = List<Map>.from(classItem['students'] ?? []);
-
-    list.add({
+    students.add({
       "name": name,
       "activities": []
     });
 
-    classItem['students'] = list;
-
+    classItem['students'] = students;
     box.putAt(0, classItem);
   }
 
@@ -38,7 +37,6 @@ class StudentRepository {
     students.removeAt(index);
 
     classItem['students'] = students;
-
     box.putAt(0, classItem);
   }
 
@@ -47,18 +45,14 @@ class StudentRepository {
     final students = List<Map>.from(classItem['students'] ?? []);
 
     final student = Map<String, dynamic>.from(students[index]);
-
-    final activities =
-        List<String>.from(student['activities'] ?? []);
+    final activities = List<String>.from(student['activities'] ?? []);
 
     activities.add(DateTime.now().toIso8601String());
 
     student['activities'] = activities;
-
     students[index] = student;
 
     classItem['students'] = students;
-
     box.putAt(0, classItem);
   }
 }
