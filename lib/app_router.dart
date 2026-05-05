@@ -41,7 +41,7 @@ final router = GoRouter(
 
     GoRoute(
       path: '/charts',
-      builder: (_, __) => const ChartsScreen(),
+      builder: (_, __) => ChartsScreen(),
     ),
 
     GoRoute(

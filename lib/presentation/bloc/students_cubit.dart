@@ -9,7 +9,8 @@ class StudentsCubit extends Cubit<List<Map>> {
   }
 
   void load() {
-    emit(repo.getStudents());
+    final data = repo.getStudents();
+    emit(data);
   }
 
   void addStudent(String name) {
@@ -18,20 +19,12 @@ class StudentsCubit extends Cubit<List<Map>> {
   }
 
   void deleteStudent(int index) {
-    try {
-      repo.deleteStudent(index);
-      load();
-    } catch (e) {
-      print("DELETE ERROR: $e");
-    }
+    repo.deleteStudent(index);
+    load();
   }
 
   void addActivity(int index) {
-    try {
-      repo.addActivity(index);
-      load();
-    } catch (e) {
-      print("ACTIVITY ERROR: $e");
-    }
+    repo.addActivity(index);
+    load();
   }
 }
