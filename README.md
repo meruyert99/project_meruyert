@@ -1,27 +1,48 @@
-<<<<<<< HEAD
-Данный проект решает следующие проблемы:
-отсутствие инструментов для отслеживания активности в реальном времени
-сложность выявления не вовлечённых учеников
-недостаток данных для улучшения учебного процесса
-Почему это важно:
-Повышение вовлечённости напрямую влияет на качество обучения, позволяет персонализировать подход и улучшает управление классом.
-=======
-# my_new_app
+<div align="center">
 
-A new Flutter project.
+# 📊 Student Activity Monitoring System
 
-## Getting Started
+### 🚀 Flutter + Hive + BLoC + Data Visualization
 
-This project is a starting point for a Flutter application.
+Система мониторинга активности учеников с аналитикой и графиками
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+<img src="https://img.shields.io/badge/Flutter-3.0-blue?style=for-the-badge&logo=flutter"/>
+<img src="https://img.shields.io/badge/Hive-Database-orange?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/BLoC-State%20Management-purple?style=for-the-badge"/>
+<img src="https://img.shields.io/badge/Status-Completed-green?style=for-the-badge"/>
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
->>>>>>> 29eb35f (first commit)
-# project_meruyert
+</div>
+
+---
+
+## ✨ О проекте
+
+Это система для мониторинга активности учеников, позволяющая:
+
+- 👤 Добавлять и удалять учеников
+- ⚡ Отслеживать активность в реальном времени
+- 📈 Визуализировать данные через графики
+- 💾 Хранить данные локально (Hive)
+
+  ## 🚀 Установка и запуск
+
+### 1️⃣ Клонировать проект
+git clone https://github.com/your-username/your-repo.git
+2️⃣ Перейти в проект
+cd my_new_app
+3️⃣ Установить зависимости
+flutter pub get
+4️⃣ Запустить приложение
+flutter run
+⚙️ Инициализация Hive
+
+Перед запуском убедись, что Hive инициализирован:
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  await Hive.openBox('classesBox');
+  runApp(MyApp());
+}
