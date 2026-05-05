@@ -7,18 +7,123 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Dashboard')),
-      body: Column(
-        children: [
-          ListTile(
-            title: const Text("Students"),
-            onTap: () => context.push('/students'),
+      backgroundColor: const Color(0xFFF5F7FA),
+
+      appBar: AppBar(
+        title: const Text("Dashboard"),
+        centerTitle: true,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        foregroundColor: Colors.black,
+      ),
+
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              "Welcome 👋",
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
+            const SizedBox(height: 6),
+
+            const Text(
+              "Manage your classes and analytics",
+              style: TextStyle(color: Colors.grey),
+            ),
+
+            const SizedBox(height: 20),
+
+            Expanded(
+              child: GridView.count(
+                crossAxisCount: 2,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                children: [
+                  MenuCard(
+                    title: "Classes",
+                    icon: Icons.class_,
+                    color: Colors.blue,
+                    onTap: () => context.push('/classes'),
+                  ),
+                  MenuCard(
+                    title: "Analytics",
+                    icon: Icons.bar_chart,
+                    color: Colors.orange,
+                    onTap: () => context.push('/charts'),
+                  ),
+                  MenuCard(
+                    title: "Students",
+                    icon: Icons.people,
+                    color: Colors.green,
+                    onTap: () => context.push('/students/0'),
+                  ),
+                  MenuCard(
+                    title: "Settings",
+                    icon: Icons.settings,
+                    color: Colors.purple,
+                    onTap: () {},
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MenuCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color color;
+  final VoidCallback onTap;
+
+  const MenuCard({
+    super.key,
+    required this.title,
+    required this.icon,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: onTap,
+      child: Ink(
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              CircleAvatar(
+                radius: 28,
+                backgroundColor: color,
+                child: Icon(icon, color: Colors.white, size: 28),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
           ),
-          ListTile(
-            title: const Text("Charts"),
-            onTap: () => context.push('/charts'),
-          ),
-        ],
+        ),
       ),
     );
   }
