@@ -19,19 +19,24 @@ class _ChartsScreenState extends State<ChartsScreen> {
 
   List get students {
     if (classes.isEmpty) return [];
-    return classes[selectedClassIndex]['students'];
+    final data = classes[selectedClassIndex]['students'];
+    return data ?? [];
   }
 
+  /// 📊 график по часам
   List<FlSpot> buildChart(List activities) {
     Map<int, double> map = {};
 
-    for (var t in activities) {
-      final dt = DateTime.parse(t);
-      map[dt.minute] = (map[dt.minute] ?? 0) + 1;
+    for (var item in activities) {
+      final dt = DateTime.tryParse(item.toString());
+      if (dt == null) continue;
+
+      final hour = dt.hour;
+      map[hour] = (map[hour] ?? 0) + 1;
     }
 
     return List.generate(
-      60,
+      24,
       (i) => FlSpot(i.toDouble(), map[i] ?? 0),
     );
   }
@@ -45,7 +50,7 @@ class _ChartsScreenState extends State<ChartsScreen> {
     }
 
     final classItem = classes[selectedClassIndex];
-    final studentsList = classItem['students'];
+    final studentsList = classItem['students'] ?? [];
 
     if (studentsList.isEmpty) {
       return const Scaffold(
@@ -54,29 +59,33 @@ class _ChartsScreenState extends State<ChartsScreen> {
     }
 
     final student = studentsList[selectedStudentIndex];
-    final data = buildChart(student['activities'] ?? []);
+    final activities = student['activities'] ?? [];
+
+    final data = buildChart(activities);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Аналитика")),
+      appBar: AppBar(
+        title: const Text("📊 Аналитика"),
+      ),
 
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // 📚 ВЫБОР КЛАССА
-            DropdownButtonFormField(
+            /// 📚 CLASS SELECTOR
+            DropdownButtonFormField<int>(
               value: selectedClassIndex,
               decoration: const InputDecoration(labelText: "Класс"),
               items: List.generate(
                 classes.length,
                 (i) => DropdownMenuItem(
                   value: i,
-                  child: Text(classes[i]['name']),
+                  child: Text(classes[i]['name'] ?? 'Class $i'),
                 ),
               ),
               onChanged: (val) {
                 setState(() {
-                  selectedClassIndex = val as int;
+                  selectedClassIndex = val ?? 0;
                   selectedStudentIndex = 0;
                 });
               },
@@ -84,67 +93,86 @@ class _ChartsScreenState extends State<ChartsScreen> {
 
             const SizedBox(height: 12),
 
-            // 👤 ВЫБОР УЧЕНИКА
-            DropdownButtonFormField(
+            /// 👤 STUDENT SELECTOR
+            DropdownButtonFormField<int>(
               value: selectedStudentIndex,
               decoration: const InputDecoration(labelText: "Ученик"),
               items: List.generate(
                 studentsList.length,
                 (i) => DropdownMenuItem(
                   value: i,
-                  child: Text(studentsList[i]['name']),
+                  child: Text(studentsList[i]['name'] ?? 'Student $i'),
                 ),
               ),
               onChanged: (val) {
                 setState(() {
-                  selectedStudentIndex = val as int;
+                  selectedStudentIndex = val ?? 0;
                 });
               },
             ),
 
             const SizedBox(height: 20),
 
-            // 📊 ГРАФИК
+            /// 📈 CHART
             Expanded(
               child: Card(
+                elevation: 3,
                 child: Padding(
                   padding: const EdgeInsets.all(12),
-                  child: LineChart(
-                    LineChartData(
-                      gridData: FlGridData(show: true),
-                      titlesData: FlTitlesData(
-                        bottomTitles: AxisTitles(
-                          sideTitles: SideTitles(
-                            showTitles: true,
-                            interval: 10,
-                            getTitlesWidget: (value, _) =>
-                                Text('${value.toInt()}m'),
+                  child: data.isEmpty
+                      ? const Center(
+                          child: Text("Нет активности"),
+                        )
+                      : LineChart(
+                          LineChartData(
+                            minY: 0,
+                            maxY: 10,
+
+                            gridData: FlGridData(show: true),
+
+                            titlesData: FlTitlesData(
+                              bottomTitles: AxisTitles(
+                                sideTitles: SideTitles(
+                                  showTitles: true,
+                                  interval: 3,
+                                  getTitlesWidget: (value, _) {
+                                    return Text('${value.toInt()}h');
+                                  },
+                                ),
+                              ),
+                              leftTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: true),
+                              ),
+                              topTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                              rightTitles: AxisTitles(
+                                sideTitles: SideTitles(showTitles: false),
+                              ),
+                            ),
+
+                            borderData: FlBorderData(show: true),
+
+                            lineBarsData: [
+                              LineChartBarData(
+                                spots: data,
+                                isCurved: true,
+                                barWidth: 3,
+                                color: Colors.blue,
+                                dotData: FlDotData(show: false),
+                              ),
+                            ],
                           ),
                         ),
-                        leftTitles: AxisTitles(
-                          sideTitles: SideTitles(showTitles: true),
-                        ),
-                      ),
-                      borderData: FlBorderData(show: true),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: data,
-                          isCurved: true,
-                          barWidth: 3,
-                          dotData: FlDotData(show: false),
-                        ),
-                      ],
-                    ),
-                  ),
                 ),
               ),
             ),
 
             const SizedBox(height: 10),
 
-            // 📊 СТАТИСТИКА
+            /// 📌 STATS
             Text(
-              "Всего активностей: ${(student['activities'] ?? []).length}",
+              "Всего активностей: ${activities.length}",
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
