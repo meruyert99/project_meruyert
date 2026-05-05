@@ -6,15 +6,19 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FA),
+      
+      backgroundColor: theme.scaffoldBackgroundColor,
 
       appBar: AppBar(
         title: const Text("Dashboard"),
         centerTitle: true,
         backgroundColor: Colors.transparent,
         elevation: 0,
-        foregroundColor: Colors.black,
+      
+        foregroundColor: theme.colorScheme.onBackground,
       ),
 
       body: Padding(
@@ -22,19 +26,18 @@ class HomeScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              "Welcome 👋",
-              style: TextStyle(
-                fontSize: 28,
+            Text(
+              "Welcome to FocusFlow",
+              style: theme.textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
             ),
 
             const SizedBox(height: 6),
 
-            const Text(
-              "Manage your classes and analytics",
-              style: TextStyle(color: Colors.grey),
+            Text(
+              "Monitor student engagement in class",
+              style: theme.textTheme.bodyMedium,
             ),
 
             const SizedBox(height: 20),
@@ -53,14 +56,12 @@ class HomeScreen extends StatelessWidget {
                     color: Colors.orange,
                     onTap: () => context.push('/charts'),
                   ),
-
                   MenuCard(
                     title: "Students",
                     icon: Icons.people,
                     color: Colors.green,
                     onTap: () => context.push('/students/0'),
                   ),
-
                   MenuCard(
                     title: "Settings",
                     icon: Icons.settings,
@@ -92,12 +93,17 @@ class MenuCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
       child: Ink(
         decoration: BoxDecoration(
-          color: color.withOpacity(0.15),
+          // ❗ адаптивный фон
+          color: color.withOpacity(
+            theme.brightness == Brightness.dark ? 0.25 : 0.15,
+          ),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Padding(
@@ -108,14 +114,19 @@ class MenuCard extends StatelessWidget {
               CircleAvatar(
                 radius: 28,
                 backgroundColor: color,
-                child: Icon(icon, color: Colors.white, size: 28),
+                child: const Icon(Icons.circle, color: Colors.transparent),
               ),
+
               const SizedBox(height: 12),
+
+              Icon(icon, color: color, size: 28),
+
+              const SizedBox(height: 8),
+
               Text(
                 title,
-                style: const TextStyle(
+                style: theme.textTheme.bodyLarge?.copyWith(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
                 ),
               ),
             ],

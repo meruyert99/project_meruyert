@@ -29,23 +29,27 @@ class SettingsScreen extends StatelessWidget {
 
           const Divider(),
 
-          // 🔔 NOTIFICATIONS (пример)
+          // 🔔 NOTIFICATIONS
           SwitchListTile(
             title: const Text("Notifications"),
             subtitle: const Text("Enable alerts"),
             value: true,
-            onChanged: (value) {},
+            onChanged: (value) {
+              // TODO: подключить логику уведомлений
+            },
             secondary: const Icon(Icons.notifications),
           ),
 
           const Divider(),
 
-          // 🌐 LANGUAGE (заглушка)
+          // 🌐 LANGUAGE
           ListTile(
             leading: const Icon(Icons.language),
             title: const Text("Language"),
             subtitle: const Text("English / Russian"),
-            onTap: () {},
+            onTap: () {
+              // TODO: открыть выбор языка
+            },
           ),
 
           const Divider(),
@@ -54,11 +58,21 @@ class SettingsScreen extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.info),
             title: const Text("About app"),
+            subtitle: const Text("Information about this application"),
             onTap: () {
               showAboutDialog(
                 context: context,
                 applicationName: "Student Tracker",
                 applicationVersion: "1.0.0",
+                applicationIcon: const Icon(Icons.school, size: 40),
+                applicationLegalese: "Made by Meruyert",
+                children: const [
+                  SizedBox(height: 10),
+                  Text(
+                    "Student Tracker helps teachers monitor student activity during lessons, "
+                    "track engagement, and analyze classroom performance in real time.",
+                  ),
+                ],
               );
             },
           ),
