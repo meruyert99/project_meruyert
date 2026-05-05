@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../bloc/students_cubit.dart';
+import '../models/student.dart';
+import '../services/export_service.dart';
 
 class StudentsScreen extends StatefulWidget {
   final int classIndex;
@@ -24,14 +27,29 @@ class _StudentsScreenState extends State<StudentsScreen> {
     super.dispose();
   }
 
+  // 📤 EXPORT
+  void _exportData(BuildContext context) async {
+    final students = context.read<StudentsCubit>().state;
+
+    final path = await ExportService.export(students);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("CSV saved: $path")),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Students (class ${widget.classIndex})'),
 
-        // 🔄 RESET ALL BUTTON
         actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            tooltip: "Export CSV",
+            onPressed: () => _exportData(context),
+          ),
           IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: "Reset all activities",
@@ -62,11 +80,10 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
           // 📋 LIST
           Expanded(
-            child: BlocBuilder<StudentsCubit, List<Map>>(
+            child: BlocBuilder<StudentsCubit, List<Student>>(
               builder: (context, students) {
                 final filtered = students.where((s) {
-                  final name = (s['name'] ?? '').toLowerCase();
-                  return name.contains(query);
+                  return s.name.toLowerCase().contains(query);
                 }).toList();
 
                 if (filtered.isEmpty) {
@@ -79,13 +96,11 @@ class _StudentsScreenState extends State<StudentsScreen> {
                     final student = filtered[index];
                     final originalIndex = students.indexOf(student);
 
-                    final activityCount =
-                        (student['activities'] as List?)?.length ?? 0;
-
                     return ListTile(
-                      title: Text(student['name']),
+                      title: Text(student.name),
 
-                      subtitle: Text('Activity: $activityCount'),
+                      subtitle:
+                          Text('Activity: ${student.activities.length}'),
 
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -123,7 +138,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // ➕ ADD STUDENT DIALOG
+  // ➕ ADD STUDENT
   void _showAddDialog(BuildContext context) {
     final controller = TextEditingController();
 
@@ -159,7 +174,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // 🗑 DELETE STUDENT
+  // 🗑 DELETE
   void _confirmDelete(BuildContext context, int index) {
     showDialog(
       context: context,
@@ -186,15 +201,13 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // 🔄 RESET ALL CONFIRMATION
+  // 🔄 RESET ALL
   void _confirmResetAll(BuildContext context) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Reset all activities"),
-        content: const Text(
-          "This will clear ALL students activities. Continue?",
-        ),
+        content: const Text("This will clear ALL students activities. Continue?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
