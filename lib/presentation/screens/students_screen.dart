@@ -14,20 +14,32 @@ class StudentsScreen extends StatefulWidget {
 class _StudentsScreenState extends State<StudentsScreen> {
   final box = Hive.box('classesBox');
 
-  Map get currentClass => box.getAt(widget.classIndex);
+  Map get currentClass => Map.from(box.getAt(widget.classIndex));
 
-  List get students => currentClass['students'];
+  List get students => List.from(currentClass['students']);
 
   void addStudent() {
-    students.add({'name': 'Student ${students.length + 1}', 'activities': []});
-    box.putAt(widget.classIndex, currentClass);
+    final updatedStudents = List.from(students);
+
+    updatedStudents.add({
+      'name': 'Student ${updatedStudents.length + 1}',
+      'activities': []
+    });
+
+    final updatedClass = Map.from(currentClass);
+    updatedClass['students'] = updatedStudents;
+
+    box.putAt(widget.classIndex, updatedClass);
+
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    final current = currentClass;
+
     return Scaffold(
-      appBar: AppBar(title: Text(currentClass['name'])),
+      appBar: AppBar(title: Text(current['name'])),
 
       body: Column(
         children: [
