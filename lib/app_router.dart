@@ -3,8 +3,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'presentation/screens/login_screen.dart';
 import 'presentation/screens/home_screen.dart';
+import 'presentation/screens/classes_screen.dart';
 import 'presentation/screens/students_screen.dart';
 import 'presentation/screens/charts_screen.dart';
+import 'presentation/screens/lesson_screen.dart';
 
 final router = GoRouter(
   initialLocation: '/login',
@@ -22,21 +24,41 @@ final router = GoRouter(
   },
 
   routes: [
+    // 🔐 LOGIN
     GoRoute(
       path: '/login',
       builder: (_, __) => const LoginScreen(),
     ),
 
+    // 🏠 HOME
     GoRoute(
       path: '/home',
       builder: (_, __) => const HomeScreen(),
     ),
 
+    // 📚 CLASSES
     GoRoute(
-      path: '/students',
-      builder: (_, __) => const StudentsScreen(),
+      path: '/classes',
+      builder: (_, __) => const ClassesScreen(),
     ),
 
+    // 👥 STUDENTS (по классу)
+    GoRoute(
+      path: '/students/:id',
+      builder: (_, state) => StudentsScreen(
+        classIndex: int.parse(state.pathParameters['id']!),
+      ),
+    ),
+
+    // ⏱ LESSON
+    GoRoute(
+      path: '/lesson/:id',
+      builder: (_, state) => LessonScreen(
+        classIndex: int.parse(state.pathParameters['id']!),
+      ),
+    ),
+
+    // 📊 CHARTS
     GoRoute(
       path: '/charts',
       builder: (_, __) => const ChartsScreen(),
