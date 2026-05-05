@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/students_cubit.dart';
-import '../models/student.dart';
-import '../services/export_service.dart';
 
 class StudentsScreen extends StatefulWidget {
   final int classIndex;
@@ -27,14 +25,15 @@ class _StudentsScreenState extends State<StudentsScreen> {
     super.dispose();
   }
 
-  // 📤 EXPORT
+  // 📤 EXPORT (временно заглушка)
   void _exportData(BuildContext context) async {
     final students = context.read<StudentsCubit>().state;
 
-    final path = await ExportService.export(students);
+    // пока без ExportService
+    debugPrint("Export students: $students");
 
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("CSV saved: $path")),
+      const SnackBar(content: Text("Export triggered")),
     );
   }
 
@@ -80,10 +79,11 @@ class _StudentsScreenState extends State<StudentsScreen> {
 
           // 📋 LIST
           Expanded(
-            child: BlocBuilder<StudentsCubit, List<Student>>(
+            child: BlocBuilder<StudentsCubit, List>(
               builder: (context, students) {
                 final filtered = students.where((s) {
-                  return s.name.toLowerCase().contains(query);
+                  final name = (s['name'] ?? '').toLowerCase();
+                  return name.contains(query);
                 }).toList();
 
                 if (filtered.isEmpty) {
@@ -96,11 +96,13 @@ class _StudentsScreenState extends State<StudentsScreen> {
                     final student = filtered[index];
                     final originalIndex = students.indexOf(student);
 
-                    return ListTile(
-                      title: Text(student.name),
+                    final activityCount =
+                        (student['activities'] as List?)?.length ?? 0;
 
-                      subtitle:
-                          Text('Activity: ${student.activities.length}'),
+                    return ListTile(
+                      title: Text(student['name']),
+
+                      subtitle: Text('Activity: $activityCount'),
 
                       trailing: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -138,7 +140,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // ➕ ADD STUDENT
+  // ➕ ADD
   void _showAddDialog(BuildContext context) {
     final controller = TextEditingController();
 
@@ -201,7 +203,7 @@ class _StudentsScreenState extends State<StudentsScreen> {
     );
   }
 
-  // 🔄 RESET ALL
+  // 🔄 RESET
   void _confirmResetAll(BuildContext context) {
     showDialog(
       context: context,
