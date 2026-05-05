@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'domain/repositories/student_repository.dart';
 import 'presentation/bloc/students_cubit.dart';
@@ -13,13 +14,16 @@ void main() async {
 
   await Hive.initFlutter();
   await Hive.openBox('studentsBox');
-  await Hive.openBox('classesBox');
 
-  runApp(const MyApp());
+  final prefs = await SharedPreferences.getInstance();
+
+  runApp(MyApp(prefs: prefs));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final SharedPreferences prefs;
+
+  const MyApp({super.key, required this.prefs});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +39,7 @@ class MyApp extends StatelessWidget {
           builder: (context, theme, _) {
             return MaterialApp.router(
               debugShowCheckedModeBanner: false,
-              routerConfig: router,
+              routerConfig: createRouter(prefs), // 🔥 ВОТ ГЛАВНЫЙ ФИКС
               theme: ThemeData(
                 useMaterial3: true,
                 colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),

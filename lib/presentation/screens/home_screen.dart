@@ -40,34 +40,32 @@ class HomeScreen extends StatelessWidget {
             const SizedBox(height: 20),
 
             Expanded(
-              child: GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
+              child: GridView(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                ),
                 children: [
-                  MenuCard(
-                    title: "Classes",
-                    icon: Icons.class_,
-                    color: Colors.blue,
-                    onTap: () => context.push('/classes'),
-                  ),
                   MenuCard(
                     title: "Analytics",
                     icon: Icons.bar_chart,
                     color: Colors.orange,
                     onTap: () => context.push('/charts'),
                   ),
+
                   MenuCard(
                     title: "Students",
                     icon: Icons.people,
                     color: Colors.green,
                     onTap: () => context.push('/students/0'),
                   ),
+
                   MenuCard(
                     title: "Settings",
                     icon: Icons.settings,
                     color: Colors.purple,
-                    onTap: () {},
+                    onTap: () => context.push('/settings'),
                   ),
                 ],
               ),
@@ -78,7 +76,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
 class MenuCard extends StatelessWidget {
   final String title;
   final IconData icon;

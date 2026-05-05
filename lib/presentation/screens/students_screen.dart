@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../bloc/students_cubit.dart';
 
-class StudentsScreen extends StatelessWidget {
+class StudentsScreen extends StatefulWidget {
   final int classIndex;
 
   const StudentsScreen({
@@ -11,56 +11,104 @@ class StudentsScreen extends StatelessWidget {
   });
 
   @override
+  State<StudentsScreen> createState() => _StudentsScreenState();
+}
+
+class _StudentsScreenState extends State<StudentsScreen> {
+  final searchController = TextEditingController();
+  String query = '';
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Students (class $classIndex)'),
+        title: Text('Students (class ${widget.classIndex})'),
       ),
 
-      body: BlocBuilder<StudentsCubit, List<Map>>(
-        builder: (context, students) {
-          if (students.isEmpty) {
-            return const Center(
-              child: Text("No students"),
-            );
-          }
+      body: Column(
+        children: [
+          // 🔍 SEARCH FIELD
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              controller: searchController,
+              decoration: const InputDecoration(
+                hintText: 'Search student...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(),
+              ),
+              onChanged: (value) {
+                setState(() {
+                  query = value.toLowerCase();
+                });
+              },
+            ),
+          ),
 
-          return ListView.builder(
-            itemCount: students.length,
-            itemBuilder: (context, index) {
-              final s = students[index];
+          // 📋 LIST
+          Expanded(
+            child: BlocBuilder<StudentsCubit, List<Map>>(
+              builder: (context, students) {
+                // 🔍 FILTER
+                final filtered = students.where((s) {
+                  final name = (s['name'] ?? '').toLowerCase();
+                  return name.contains(query);
+                }).toList();
 
-              return ListTile(
-                title: Text(s['name']),
-                subtitle: Text('Activity: ${s['activity']}'),
+                if (filtered.isEmpty) {
+                  return const Center(
+                    child: Text("No students"),
+                  );
+                }
 
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    // ➕ increase activity
-                    IconButton(
-                      icon: const Icon(Icons.add),
-                      onPressed: () {
-                        context.read<StudentsCubit>().addActivity(index);
-                      },
-                    ),
+                return ListView.builder(
+                  itemCount: filtered.length,
+                  itemBuilder: (context, index) {
+                    final s = filtered[index];
 
-                    // 🗑 delete with confirmation
-                    IconButton(
-                      icon: const Icon(Icons.delete),
-                      onPressed: () {
-                        _confirmDelete(context, index);
-                      },
-                    ),
-                  ],
-                ),
-              );
-            },
-          );
-        },
+                    return ListTile(
+                      title: Text(s['name']),
+                      subtitle: Text('Activity: ${s['activity']}'),
+
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.add),
+                            onPressed: () {
+                              final originalIndex =
+                                  students.indexOf(s); // 👈 важно!
+                              context
+                                  .read<StudentsCubit>()
+                                  .addActivity(originalIndex);
+                            },
+                          ),
+
+                          IconButton(
+                            icon: const Icon(Icons.delete),
+                            onPressed: () {
+                              final originalIndex =
+                                  students.indexOf(s);
+                              _confirmDelete(context, originalIndex);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
 
-      // ➕ add student
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context),
         child: const Icon(Icons.add),
@@ -68,7 +116,7 @@ class StudentsScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- ADD STUDENT ----------------
+  // ADD
   void _showAddDialog(BuildContext context) {
     final controller = TextEditingController();
 
@@ -90,9 +138,7 @@ class StudentsScreen extends StatelessWidget {
           ElevatedButton(
             onPressed: () {
               if (controller.text.isNotEmpty) {
-                context
-                    .read<StudentsCubit>()
-                    .addStudent(controller.text);
+                context.read<StudentsCubit>().addStudent(controller.text);
               }
               Navigator.pop(context);
             },
@@ -103,13 +149,13 @@ class StudentsScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- DELETE STUDENT ----------------
+  // DELETE
   void _confirmDelete(BuildContext context, int index) {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         title: const Text("Delete student"),
-        content: const Text("Are you sure you want to delete this student?"),
+        content: const Text("Are you sure?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
