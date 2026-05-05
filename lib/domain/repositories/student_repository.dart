@@ -1,23 +1,25 @@
 import 'package:hive/hive.dart';
 
 class StudentRepository {
-  final box = Hive.box('studentsBox');
+  Box get box => Hive.box('studentsBox');
 
-  List getAll() => box.values.toList();
-
-  void add(String name) {
-    box.add({'name': name, 'sessions': []});
+  List<Map> getStudents() {
+    return box.values
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 
-  void delete(int index) {
+  void addStudent(String name) {
+    box.add({'name': name, 'activity': 0});
+  }
+
+  void deleteStudent(int index) {
     box.deleteAt(index);
   }
 
-  void addSession(int index, Map session) {
-    var student = box.getAt(index);
-    List sessions = student['sessions'] ?? [];
-    sessions.add(session);
-    student['sessions'] = sessions;
+  void addActivity(int index) {
+    final student = Map<String, dynamic>.from(box.getAt(index));
+    student['activity'] = (student['activity'] ?? 0) + 1;
     box.putAt(index, student);
   }
 }
