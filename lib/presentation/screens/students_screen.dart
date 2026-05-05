@@ -1,37 +1,57 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../bloc/students_cubit.dart';
+import 'package:hive/hive.dart';
+import 'package:go_router/go_router.dart';
 
-class StudentsScreen extends StatelessWidget {
-  const StudentsScreen({super.key});
+class StudentsScreen extends StatefulWidget {
+  final int classIndex;
+
+  const StudentsScreen({super.key, required this.classIndex});
+
+  @override
+  State<StudentsScreen> createState() => _StudentsScreenState();
+}
+
+class _StudentsScreenState extends State<StudentsScreen> {
+  final box = Hive.box('classesBox');
+
+  Map get currentClass => box.getAt(widget.classIndex);
+
+  List get students => currentClass['students'];
+
+  void addStudent() {
+    students.add({'name': 'Student ${students.length + 1}', 'activities': []});
+    box.putAt(widget.classIndex, currentClass);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    final cubit = context.read<StudentCubit>();
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Students")),
+      appBar: AppBar(title: Text(currentClass['name'])),
 
-      body: BlocBuilder<StudentCubit, List>(
-        builder: (context, students) {
-          return ListView.builder(
-            itemCount: students.length,
-            itemBuilder: (_, i) {
-              final s = students[i];
-              return ListTile(
-                title: Text(s['name']),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () => cubit.delete(i),
-                ),
-              );
-            },
-          );
-        },
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: students.length,
+              itemBuilder: (_, i) {
+                final s = students[i];
+                return ListTile(
+                  title: Text(s['name']),
+                );
+              },
+            ),
+          ),
+
+          ElevatedButton(
+            onPressed: () => context.push('/lesson/${widget.classIndex}'),
+            child: const Text("Start Lesson"),
+          )
+        ],
       ),
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () => cubit.add("Student ${DateTime.now().second}"),
+        onPressed: addStudent,
         child: const Icon(Icons.add),
       ),
     );
