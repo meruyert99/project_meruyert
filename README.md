@@ -44,5 +44,80 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
   await Hive.openBox('classesBox');
+
+
+
+  ⚙️ Технологии
+Flutter
+Dart
+Firebase Auth
+Hive (local database)
+BLoC (flutter_bloc)
+GoRouter
+Provider (theme management)
+📂 Архитектура проекта
+lib/
+ ├ core/                 # theme, utils
+ ├ domain/
+ │   └ repositories/    # логика данных
+ ├ presentation/
+ │   ├ bloc/           # Cubit / BLoC
+ │   └ screens/        # UI экраны
+ ├ app_router.dart     # навигация
+ └ main.dart           # entry point
+🚀 Возможности
+🔐 Авторизация
+Login через Firebase
+Сохранение состояния входа
+🏫 Классы
+Добавление классов
+Просмотр списка классов
+👨‍🎓 Студенты
+Добавление студентов
+Удаление студентов
+Увеличение активности
+Хранение данных в Hive
+📊 Аналитика
+Отображение активности студентов
+▶️ Как запустить проект
+1. Установить зависимости
+flutter pub get
+2. Запустить приложение
+flutter run
+🔥 Firebase настройка (обязательно)
+
+Перед запуском:
+
+Добавь Firebase проект
+Подключи:
+google-services.json (Android)
+GoogleService-Info.plist (iOS)
+Включи Firebase Auth
+💾 Hive настройка
+
+Локальная база данных автоматически инициализируется:
+
+await Hive.initFlutter();
+await Hive.openBox('studentsBox');
+
+
+
+🧩 Основные экраны
+/login — экран входа
+/home — главный дашборд
+/classes — список классов
+/students/:id — студенты класса
+/charts — аналитика
+👨‍💻 Автор
+
+Проект разработан в рамках обучения Flutter + Firebase + Clean Architecture.
+
+📌 Примечание
+
+Этот проект демонстрирует:
+
+работу с state management (BLoC)
+локальную БД (Hive)
+навигацию (GoRouter)
   runApp(MyApp());
 }
